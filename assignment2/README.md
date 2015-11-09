@@ -3,6 +3,7 @@ This assignment is about studying data classification. Specifically, we study th
 http://archive.ics.uci.edu/ml/datasets/Adult
 
 This is a dataset with people of different attributes (14 attributes) and the task is to classify whether an individual earns salary > $50K. There are in total 48842 data items.
+
 1.	(10 pts.) Clean up the Adult dataset by removing all the data items with incomplete attributes. The cleaned up dataset will be used as the original dataset in the rest of the assignment.
 
 2.	(30 pts.) Implement a sampling function that takes a stratified sampling of X percentage of the total number of data items in proportion to the total number of positive samples and the total number of negative samples in the dataset. Apply your function to Adult dataset to generate three different training datasets as 10%, 30%, and 50% of the original dataset, respectively.
