@@ -1,0 +1,6 @@
+This assignment is about studying the data reduction methods. Specifically, we study the histogram method. You are given this assignment package in which there are three images named I1, I2, and I3, respectively, and you are given the corresponding three matrices for the three images. Clearly, all the three images look different in content. You may use any programming language to complete this assignment.
+
+1.	Write a function that takes an image (as a matrix) and returns the histogram for this image. The function takes a parameter as the histogram bucket size. Write down the code of this function as an answer to this question (30 pts.)
+2.	Apply this function to each of the three images given, respectively, using three different bucket sizes (at your own choices) and report and analyze your observations (40 pts.)
+3.	We all know that histograms are a method for data reduction, and in this study we use one-dimensional histograms to represent two-dimensional images. How effective are histograms used to represent images of the same object but under rotations in three-dimensional space or under a partial occlusion as shown in images I4, I5, and I6 in the same assignment package? (30 pts.)
+
