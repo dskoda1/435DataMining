@@ -6,88 +6,12 @@ CS 435
 Assignment 1
 Environment: Python3, not compatible with Python2.7
 """
-
+from Population import Population
+from Adult import Adult
 import csv
 import sys
 import math
-'''
-Population is the object used to store all of the 
-data. It also tracks how many pos/negative vals there
-are after parsing the file.
-'''
-class Population(object):
-	def __init__(self, data):
-		self.data = data
-		self.numPos = 0
-		self.numNeg = 0
-		self.total = len(data)
-		self.pos = []
-		self.neg = []
-		self.setPosNeg()
-	def setPosNeg(self):
-		for x in self.data:
-			if x.label:
-				self.pos.append(x)
-				self.numPos = self.numPos + 1
-			else:
-				self.neg.append(x)
-				self.numNeg = self.numNeg + 1
-'''
-print(x.labelprint(x.label))Adult is the object used to store data from the file
-
-'''
-class Adult(object):
-	def __init__(self):
-		self.age = 0
-		self.workclass = ""	
-		self.fnlwgt = 0
-		self.education = ""
-		self.education_num = 0
-		self.marital_status = ""
-		self.occupation = ""
-		self.relationship = ""
-		self.race = ""
-		self.sax = ""
-		self.capital_gain = 0
-		self.capital_loss = 0
-		self.hours_per_week = 0
-		self.native_country = ""
-		self.label = False
-	'''
-	Take in a row from the csv reader after it has
-	been checked, and set object data to row from file
-	'''
-	def initData(self, data):
-		self.age = data[0]
-		self.workclass = data[1]	
-		self.fnlwgt = data[2]
-		self.education = data[3]
-		self.education_num = data[4]
-		self.marital_status = data[5]
-		self.occupation = data[6]
-		self.relationship = data[7]
-		self.race = data[8]
-		self.sax = data[9]
-		self.capital_gain = data[10]
-		self.capital_loss = data[11]
-		self.hours_per_week = data[12]
-		self.native_country = data[13]
-		if '<=' in data[14]:
-			self.label = False
-		else:
-			self.label = True
-	'''
-	Check if row of data is clean to use
-	'''
-	def checkData(self, data):
-		if data == []:
-			return -1
-		for x in data:
-			if '?' in x:
-				return -1
-			else:
-				continue
-		return 1
+import random
 
 '''
 '''
@@ -126,51 +50,84 @@ Create a training set from the original set
 proportionate to the number of positives/negatives
 in the file
 '''
-def takeSample(pop, percent):
+def createTrainingSet(pop, percent):
 
 	#run some math to get the sample sizes
-	SS = len(pop.data) / (100/int(percent)
+	SS = len(pop.data) / (100/int(percent))
 	posRatio = pop.numPos / pop.total
 	negRatio = pop.numNeg / pop.total
 	posSS = SS * posRatio
 	negSS = SS * negRatio
-	posI = pop.numPos/posSS - 1
-	negI = pop.numNeg/negSS - 1
-	i = 0
-	pos = []
-	neg = []
 
-	#Create the pos and neg samples
-	#from the original data
-	for x in pop.pos:
-		if i >= posI:
-			pos.append(x)
-			i = 0
-		else:
-			i = i + 1
-	for x in pop.neg:
-		if i >= negI:
-			neg.append(x)
-			i = 0
-		else:
-			i = i + 1
+	#create a random sample from pop pos/neg
+	sSets = createTrainingSetHelper(pop, posSS, negSS)
+	posSet = sSets['pSet']
+	negSet = sSets['nSet']	
 
 	#actually create the object with
 	#the samples created above
-	samPop = Population(pos + neg)
+	return  Population(posSet + negSet)
 
+'''
+Based on the sample sizes for pos/neg requested,
+create two sets of random integers which will be used 
+to create the stratified Samples
+'''
+def createTrainingSetHelper(pop, posSS, negSS):
+	#Initialize the sets use to store random indices
+	posSet = set()
+	negSet = set()
+	#initialize the lists to store objects
+	posObjLst = []
+	negObjLst = []
+	#cast parameters to int
+	posSS = int(posSS)
+	negSS = int(negSS)
+	
+	#actually create the random samples now
+	x = 0	
+	while x < posSS:
+		r = random.randrange(0, posSS)
+		if r not in posSet:
+			posSet.add(r)
+			posObjLst.append(pop.pos[x])
+			x = x + 1
+
+	x = 0
+	while x < negSS:
+		r = random.randrange(0, negSS)
+		if r not in negSet:
+			negSet.add(r)
+			negObjLst.append(pop.neg[x])
+			x = x + 1
+	#return the sample sets obtained in a dict
+	return {'pSet': posObjLst, 'nSet': negObjLst}
+
+def filterOutTrainingSet(pop, tPop):
+	trainingSet = set()
+	testSet = []
+	#place training data into a set(was a list)
+	for x in tPop.data:
+		trainingSet.add(x)
+	for x in pop.data:
+		if x not in trainingSet:
+			testSet.append(x)
+		
+	return Population(testSet)
 
 
 def main():
-	
+	#Make sure program called correctly	
 	checkArguments()
+	#input the inital adults data file, clean data
 	population = readFile("adult.txt")
-	#print(str(len(population.data)))
-	#print(str(len(population.pos)))
-	#print(str(len(population.neg)))
-	takeSample(population, sys.argv[1])
-
-
+	#create training data set from the original,
+	#along with the percent requested from cmd line
+	trainingPop = createTrainingSet(population, sys.argv[1])
+	#Get the rest of the data as a testing data set
+	testingPop = filterOutTrainingSet(population, trainingPop)
+	print(str(len(trainingPop.data)))
+	print(str(len(testingPop.data)))
 
 main()
 
