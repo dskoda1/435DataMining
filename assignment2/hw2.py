@@ -27,24 +27,25 @@ return the cleaned data set
 def readFile(fileName):
 	f = open(fileName, 'rU')
 	data = []
-	removed = 0
-	kept = 0
 	try:
 		reader = csv.reader(f)
+		#go through each row in the file, creating a 
+		#new adult. Check if data is legit, then add 
+		#adult to list.
 		for row in reader:
 			a = Adult()
 			if a.checkData(row) > 0:
 				a.initData(row)
 				data.append(a)
-				kept = kept + 1
-			else:
-				removed = removed + 1
+	#catch any errors, close file	
 	except:
 		print("unexpected error" + str(sys.exc_info()[0]))
 	finally:
 		f.close()
-	pop = Population(data)
-	return pop
+	#Create population object to return 
+	return Population(data)
+	
+
 '''
 Create a training set from the original set
 proportionate to the number of positives/negatives
@@ -52,7 +53,8 @@ in the file
 '''
 def createTrainingSet(pop, percent):
 
-	#run some math to get the sample sizes
+	#run some math to get the sample sizes needed
+	#for each class
 	SS = len(pop.data) / (100/int(percent))
 	posRatio = pop.numPos / pop.total
 	negRatio = pop.numNeg / pop.total
@@ -112,22 +114,27 @@ def filterOutTrainingSet(pop, tPop):
 	for x in pop.data:
 		if x not in trainingSet:
 			testSet.append(x)
-		
+
+	#return what is now the testing set	
 	return Population(testSet)
 
 
 def main():
 	#Make sure program called correctly	
 	checkArguments()
+
 	#input the inital adults data file, clean data
 	population = readFile("adult.txt")
+
 	#create training data set from the original,
 	#along with the percent requested from cmd line
 	trainingPop = createTrainingSet(population, sys.argv[1])
+
 	#Get the rest of the data as a testing data set
 	testingPop = filterOutTrainingSet(population, trainingPop)
-	print(str(len(trainingPop.data)))
-	print(str(len(testingPop.data)))
+	
+	#
+
 
 main()
 

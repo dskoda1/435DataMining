@@ -6,43 +6,25 @@ Adult is the object used to store data from the file
 '''
 class Adult(object):
 	def __init__(self):
-		self.age = 0
-		self.workclass = ""
-		self.fnlwgt = 0
-		self.education = ""
-		self.education_num = 0
-		self.marital_status = ""
-		self.occupation = ""
-		self.relationship = ""
-		self.race = ""
-		self.sax = ""
-		self.capital_gain = 0
-		self.capital_loss = 0
-		self.hours_per_week = 0
-		self.native_country = ""
+		self.attr = []
 		self.label = False
-
+		self.attrIdents = []
 
 	'''
 	Take in a row from the csv reader after it has
 	been checked, and set object data to row from file
 	'''
 	def initData(self, data):
-		self.age = data[0]
-		self.workclass = data[1]
-		self.fnlwgt = data[2]
-		self.education = data[3]
-		self.education_num = data[4]
-		self.marital_status = data[5]
-		self.occupation = data[6]
-		self.relationship = data[7]
-		self.race = data[8]
-		self.sax = data[9]
-		self.capital_gain = data[10]
-		self.capital_loss = data[11]
-		self.hours_per_week = data[12]
-		self.native_country = data[13]
-		if '<=' in data[14]:
+		for x in data[:-1]:
+			#for each value attempt a cast to int. if succeeds,
+			#then store as int. otherwise catch and store str.
+			try:
+				a = int(x)
+				self.attr.append({'value': a, 'type': 'int'})
+			except ValueError:
+				self.attr.append({'value': x, 'type': 'str'})
+		#store class label.
+		if '<=' in data[-1]:
 			self.label = False
 		else:
 			self.label = True
