@@ -12,7 +12,6 @@ import csv
 import sys
 import math
 import random
-
 '''
 '''
 def checkArguments():
@@ -88,6 +87,7 @@ def createTrainingSetHelper(pop, posSS, negSS):
 	
 	#actually create the random samples now
 	x = 0	
+	random.seed()
 	while x < posSS:
 		r = random.randrange(0, posSS)
 		if r not in posSet:
@@ -125,10 +125,16 @@ def main():
 
 	#input the inital adults data file, clean data
 	population = readFile("adult.txt")
-
+	
+	#get the backbone attribute map to be used later
+	attrMap = population.createAttrMap()
+	
 	#create training data set from the original,
 	#along with the percent requested from cmd line
 	trainingPop = createTrainingSet(population, sys.argv[1])
+
+	#get some general stats about the training set
+	trainingPop.countUpStats(attrMap)
 
 	#Get the rest of the data as a testing data set
 	testingPop = filterOutTrainingSet(population, trainingPop)
