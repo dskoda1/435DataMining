@@ -131,9 +131,11 @@ class Population(object):
 		  else:
 			  #pass the occurences list at this index, along with the count
 			  #to a function which returns a probability list for each discrete val
-			  lst = generateDiscreteProbs(self.posCounts[i], self.numPos)
-			  print(self.posCounts[i])
-			  print(lst)
+			  self.stats['negStats'].append(generateDiscreteProbs(self.negCounts[i], self.numNeg))
+			  self.stats['posStats'].append(generateDiscreteProbs(self.posCounts[i], self.numPos))
+			
+	  print(self.stats)	
+			 
 			  
 
 
@@ -150,8 +152,6 @@ def generateContinuousStats(attrI, attrSum, classObjects):
 		varSum = varSum + pow((x.attr[attrI]['value'] - statsMap['mean']), 2)
 	statsMap['variance'] = varSum / statsMap['count']
 	statsMap['dev'] = math.sqrt(statsMap['variance'])	
-	#print(statsMap)
-
 	return statsMap
 
 def generateDiscreteProbs(occurL, count):
