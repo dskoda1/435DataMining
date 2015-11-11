@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import copy
+import math
 '''
 Population is the object used to store all of the 
 data. It also tracks how many pos/negative vals there
@@ -13,10 +14,7 @@ class Population(object):
     self.total = len(data)
     self.pos = []
     self.neg = []
-    self.stats = []
-    self.ncStats = []   
     self.setPosNeg()
-    #self.initStatsDS()	
     
 	
   def setPosNeg(self):
@@ -29,27 +27,6 @@ class Population(object):
         self.numNeg = self.numNeg + 1
 
 
-  '''
-  Need to go through entire data set analyzing each 
-  attributes potential values. if value is an integer,
-  store that in appropriate index in self.contVals. Else
-  create a map value for the string value in self.stats
-  '''
-  def initStatsDS(self):
-	  for x in self.data[0].attr:
-		  if x['type'] == 'str':
-			  self.stats.append([])
-		  else:
-			  self.stats.append(0)
-
-	  for x in self.data:
-		  for i, y in enumerate(x.attr):
-			  if y['type'] == 'int':
-				  self.stats[i] = self.stats[i] + y['value']
-			  else:
-				  if y['value'] not in self.stats[i]:
-					  self.stats[i].append(y['value'])
-	  print(self.stats)
   '''
   create the attribute map dynamically from the entire
   population. this is meant to be called on the entire 
@@ -130,16 +107,59 @@ class Population(object):
 	  #print(self.posCounts)
 	  #print(self.negCounts)
 
+  '''
+  for continuous values: calculate the average&std dev
+  for discrete: divide each amount of occurences by length
+  of sample to obtain probablity
+  '''
+  def performStatisticAnalysis(self, attrMap):
+	  #Create the data structure that will be used
+	  #a dictionary
+	  self.stats = {'posStats': [], 'negStats': []}
+
+	  #for the continuous values, add a map to that index
+	  #designating each required stat to be calculated
+	  #for the discrete values, just copy from the 
+	  for i, x in enumerate(attrMap):
+		  if isinstance(x, int):
+			  #pass the sum, along with the positive objects and attr index
+			  #get a stats map back, which has sum, mean, variance,
+			  #standard deviation. append this to stats['posStats']
+			  #statsMap = generateContinuousStats(i, self.posCounts[i], self.pos)
+			  self.stats['negStats'].append(generateContinuousStats(i, self.negCounts[i], self.neg))
+			  self.stats['posStats'].append(generateContinuousStats(i, self.posCounts[i], self.pos))
+		  else:
+			  #pass the occurences list at this index, along with the count
+			  #to a function which returns a probability list for each discrete val
+			  lst = generateDiscreteProbs(self.posCounts[i], self.numPos)
+			  print(self.posCounts[i])
+			  print(lst)
+			  
 
 
+'''
+calculate mean, variance, standard deviation for a given class, attribute
+'''
+def generateContinuousStats(attrI, attrSum, classObjects):
+	statsMap = {'sum': attrSum, 'variance': 0, 'mean': 0, 'dev': 0, 'count': len(classObjects)}
+	#calculate mean
+	statsMap['mean'] = statsMap['sum'] / statsMap['count']
+	#calculate variance
+	varSum = 0
+	for x in classObjects:
+		varSum = varSum + pow((x.attr[attrI]['value'] - statsMap['mean']), 2)
+	statsMap['variance'] = varSum / statsMap['count']
+	statsMap['dev'] = math.sqrt(statsMap['variance'])	
+	#print(statsMap)
 
+	return statsMap
 
+def generateDiscreteProbs(occurL, count):
+	retList = []
+	for x in occurL:
+		retList.append(x / count)
 
-
-
-
-
-
+	return retList
 
 
 

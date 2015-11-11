@@ -133,8 +133,15 @@ def main():
 	#along with the percent requested from cmd line
 	trainingPop = createTrainingSet(population, sys.argv[1])
 
-	#get some general stats about the training set
+	#sum up/count occurences of values in the training set
 	trainingPop.countUpStats(attrMap)
+
+	#create data members that store probabilities for discrete
+	#and averages/standard deviation for continuous values
+	trainingPop.performStatisticAnalysis(attrMap)
+
+
+
 
 	#Get the rest of the data as a testing data set
 	testingPop = filterOutTrainingSet(population, trainingPop)
