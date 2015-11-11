@@ -3,7 +3,7 @@
 """
 David Skoda
 CS 435
-Assignment 1
+Assignment 2
 Environment: Python3, not compatible with Python2.7
 """
 from Population import Population
