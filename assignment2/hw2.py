@@ -9,12 +9,15 @@ Environment: Python3, not compatible with Python2.7
 from Population import Population
 from Adult import Adult
 from Helper import *
+from func import *
 import csv
 import sys
 import math
 import random
 import functools
 import time
+
+
 
 '''
 Open the file and create the cleaned data set
