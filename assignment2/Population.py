@@ -2,7 +2,7 @@
 import copy
 import math
 import random
-from Helper import guass
+from Helper import *
 import functools
 '''
 Population is the object used to store all of the 
@@ -218,7 +218,6 @@ class Population(object):
   Return a population of 20 random tuples
   '''
   def getTestingSamples(self, ss):
-  	 
 	  random.seed()
 	  tSet = set()
 	  x = 0
@@ -244,7 +243,6 @@ class Population(object):
 	Then compare these results with the actual labels.
 	'''
   def attemptClassification(self, stats, attrMap):
-
 	  accuracy = []
     #iterate through the populations adults
 	  for i, x in enumerate(self.data):
@@ -278,33 +276,6 @@ class Population(object):
 		  accuracy.append(1) if label == x.label else accuracy.append(0)
 
 	  return (functools.reduce(lambda x, y: x + y, accuracy)/20) * 100
-
-
-'''
-calculate mean, variance, standard deviation for a given class, attribute
-'''
-def generateContinuousStats(attrI, attrSum, classObjects):
-	statsMap = {'sum': attrSum, 'variance': 0, 'mean': 0, 'dev': 0, 'count': len(classObjects)}
-	#calculate mean
-	statsMap['mean'] = statsMap['sum'] / statsMap['count']
-	#calculate variance
-	varSum = 0
-	for x in classObjects:
-		varSum = varSum + pow((x.attr[attrI]['value'] - statsMap['mean']), 2)
-	statsMap['variance'] = varSum / statsMap['count']
-	statsMap['dev'] = math.sqrt(statsMap['variance'])	
-	return statsMap
-
-def generateDiscreteProbs(occurL, count):
-	retList = []
-	for x in occurL:
-		retList.append(x / count)
-
-	return retList
-
-
-
-
 
 
 
