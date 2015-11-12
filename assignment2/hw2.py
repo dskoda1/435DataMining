@@ -13,6 +13,7 @@ import sys
 import math
 import random
 import functools
+import time
 '''
 '''
 def checkArguments():
@@ -170,7 +171,6 @@ def attemptClassification(pop, stats, attrMap):
 	
 	return (functools.reduce(lambda x, y: x + y, accuracy)/20) * 100
 
-		#print("Positive is greater: ",posProb) if posProb > negProb else print("Negative is greater: ", negProb)
 
 
 
@@ -198,26 +198,42 @@ def main():
 	#along with the percent requested from cmd line
 	percent = sys.argv[1]
 	
-
-	trainingPop = createTrainingSet(population, percent)
+	#At this point we can begin the loop for testing
+	runs, x = 0, 0
+	results = []
+	if runMode == 1: 
+		runs = 1 
+	else: 
+		runs = int(sys.argv[2])
+	t0 = time.time()
+	while x < runs:	
+		trainingPop = createTrainingSet(population, percent)
+		
+		#Get the rest of the data as a testing data set
+		testingPop = filterOutTrainingSet(population, trainingPop)
 	
-	#Get the rest of the data as a testing data set
-	testingPop = filterOutTrainingSet(population, trainingPop)
+		#sum up/count occurences of values in the training set
+		trainingPop.countUpStats(attrMap)
+	
+		#create data members that store probabilities for discrete
+		#and averages/standard deviation for continuous values
+		trainingPop.performStatisticAnalysis(attrMap)
+	
+		#Get 20 random tuples from the testing population
+		rPop = testingPop.getTestingSamples(20)
+	
+		#Use the training population statsMap, and the random
+		#population from the testing set and classify them
+		results.append(attemptClassification(rPop, trainingPop.stats, attrMap))
+		
+		x = x + 1
+	t1 = time.time()
 
-	#sum up/count occurences of values in the training set
-	trainingPop.countUpStats(attrMap)
-
-	#create data members that store probabilities for discrete
-	#and averages/standard deviation for continuous values
-	trainingPop.performStatisticAnalysis(attrMap)
-
-	#Get 20 random tuples from the testing population
-	rPop = testingPop.getTestingSamples(20)
-
-	#Use the training population statsMap, and the random
-	#population from the testing set and classify them
-	accPercent = attemptClassification(rPop, trainingPop.stats, attrMap)
-	print(accPercent)
+	print("\n\n")
+	print("\tAverage accuracy of: ", functools.reduce(lambda x, y: x + y, results) / runs)
+	print("\tAverage time of run: ", (t1 - t0) / runs)
+	print("\tNumber of runs: ", runs)
+	print("\n\n")
 
 main()
 
