@@ -2,6 +2,8 @@
 import copy
 import math
 import random
+from Helper import guass
+import functools
 '''
 Population is the object used to store all of the 
 data. It also tracks how many pos/negative vals there
@@ -52,6 +54,81 @@ class Population(object):
 					  stats[i].append(y['value'])
 
 	  return stats
+
+
+  '''
+  Create a training set from the original set
+  proportionate to the number of positives/negatives
+  in the file
+  '''
+  def createTrainingSet(self, percent):
+
+    #run some math to get the sample sizes needed
+    #for each class
+    SS = len(self.data) / (100/int(percent))
+    posRatio = self.numPos / self.total
+    negRatio = self.numNeg / self.total
+    posSS = SS * posRatio
+    negSS = SS * negRatio
+
+    #create a random sample from pop pos/neg
+    sSets = self.createTrainingSetHelper( posSS, negSS)
+    posSet = sSets['pSet']
+    negSet = sSets['nSet']
+
+    #actually create the object with
+    #the samples created above
+    return  Population(posSet + negSet)
+
+  '''
+  Based on the sample sizes for pos/neg requested,
+  create two sets of random integers which will be used 
+  to create the stratified Samples
+  '''
+  def createTrainingSetHelper(self, posSS, negSS):
+    #Initialize the sets use to store random indices
+    posSet = set()
+    negSet = set()
+    #initialize the lists to store objects
+    posObjLst = []
+    negObjLst = []
+    #cast parameters to int
+    posSS = int(posSS)
+    negSS = int(negSS)
+
+    #actually create the random samples now
+    x = 0
+    random.seed()
+    while x < posSS:
+      r = random.randrange(0, posSS)
+      if r not in posSet:
+        posSet.add(r)
+        posObjLst.append(self.pos[x])
+        x = x + 1
+
+    x = 0
+    while x < negSS:
+      r = random.randrange(0, negSS)
+      if r not in negSet:
+        negSet.add(r)
+        negObjLst.append(self.neg[x])
+        x = x + 1
+    #return the sample sets obtained in a dict
+    return {'pSet': posObjLst, 'nSet': negObjLst}
+
+  def filterOutTrainingSet(self, tPop):
+    trainingSet = set()
+    testSet = []
+    #place training data into a set(was a list)
+    for x in tPop.data:
+      trainingSet.add(x)
+    for x in self.data:
+      if x not in trainingSet:
+        testSet.append(x)
+
+    #return what is now the testing set 
+    return Population(testSet)
+
 
   '''
   For the given population, count up the occurences of 
@@ -158,6 +235,50 @@ class Population(object):
  
 	  return Population(tPop)
 
+  '''
+	Go through each of the items in the given population.
+	For each tuples attribute, obtain the probability that
+	it is positive or negative, and put them in seperate lists.
+	upon completing the completion of these lists, multiply
+	them together and pick the higher one, and use that to classify.
+	Then compare these results with the actual labels.
+	'''
+  def attemptClassification(self, stats, attrMap):
+
+	  accuracy = []
+    #iterate through the populations adults
+	  for i, x in enumerate(self.data):
+		  probMap = {'posProbs': [], 'negProbs': []}
+		  #iterate through a specific adults attributes 
+		  for j, y in enumerate(x.attr):
+			  #for continuous variable, pass value to guass function
+			  #along with the current mean and std dev for both
+			  #pos/neg
+			  if y['type'] == 'int':
+				  posProb = guass(y['value'], stats['posStats'][j]['mean'], stats['posStats'][j]['dev'])
+				  negProb = guass(y['value'], stats['negStats'][j]['mean'], stats['negStats'][j]['dev'])
+				  probMap['posProbs'].append(posProb)
+				  probMap['negProbs'].append(negProb)
+			  #for discrete value, get the index value has in attribute map, 
+			  #and use that to look up the probablity for that value inside stats
+			  else:
+				  idx = attrMap[j].index(y['value'])
+				  probMap['posProbs'].append(stats['posStats'][j][idx])
+				  probMap['negProbs'].append(stats['negStats'][j][idx])
+		  #multiply each index of the separate lists together
+		  posProb = functools.reduce(lambda x, y: x * y, probMap['posProbs'])
+		  negProb = functools.reduce(lambda x, y: x * y, probMap['negProbs'])
+		  #Now figure the larger one, and use that as classification label
+		  label = 0
+		  if posProb > negProb:
+			  label = True
+		  else:
+			  label = False
+		  #Check our label against actual label, store in accuracy list
+		  accuracy.append(1) if label == x.label else accuracy.append(0)
+
+	  return (functools.reduce(lambda x, y: x + y, accuracy)/20) * 100
+
 
 '''
 calculate mean, variance, standard deviation for a given class, attribute
@@ -180,12 +301,6 @@ def generateDiscreteProbs(occurL, count):
 		retList.append(x / count)
 
 	return retList
-
-
-
-
-
-
 
 
 
