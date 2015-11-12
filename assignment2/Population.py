@@ -235,13 +235,13 @@ class Population(object):
 	  return Population(tPop)
 
   '''
-	Go through each of the items in the given population.
-	For each tuples attribute, obtain the probability that
-	it is positive or negative, and put them in seperate lists.
-	upon completing the completion of these lists, multiply
-	them together and pick the higher one, and use that to classify.
-	Then compare these results with the actual labels.
-	'''
+  Go through each of the items in the given population.
+  For each tuples attribute, obtain the probability that
+  it is positive or negative, and put them in seperate lists.
+  upon completing the completion of these lists, multiply
+  them together and pick the higher one, and use that to classify.
+  Then compare these results with the actual labels.
+  '''
   def attemptClassification(self, stats, attrMap):
 	  accuracy = []
     #iterate through the populations adults
