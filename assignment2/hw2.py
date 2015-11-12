@@ -182,6 +182,15 @@ def guass(val, mean, dev):
 	right = math.pow( ( (val - mean) / dev ), 2 ) * ( - 1 / 2 )
 	return left * ( math.pow( math.e , right)) 
 
+
+def percentGen():
+	y = list(range(1, 11))
+	for x in y:
+		yield x * 10
+
+
+
+
 def main():
 	#Make sure program called correctly	
 	runMode = checkArguments()
@@ -201,10 +210,14 @@ def main():
 	#At this point we can begin the loop for testing
 	runs, x = 0, 0
 	results = []
+	gen = percentGen()
 	if runMode == 1: 
 		runs = 1 
 	else: 
 		runs = int(sys.argv[2])
+		if runs < 10:
+			print("Minimum amount of runs is 10.")
+			runs = 10
 	t0 = time.time()
 	while x < runs:	
 		trainingPop = createTrainingSet(population, percent)
@@ -227,6 +240,8 @@ def main():
 		results.append(attemptClassification(rPop, trainingPop.stats, attrMap))
 		
 		x = x + 1
+		if x % (runs / 10) ==0:
+			print( next(gen) , "%") 
 	t1 = time.time()
 
 	print("\n\n")
