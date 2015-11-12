@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import copy
 import math
+import random
 '''
 Population is the object used to store all of the 
 data. It also tracks how many pos/negative vals there
@@ -134,9 +135,28 @@ class Population(object):
 			  self.stats['negStats'].append(generateDiscreteProbs(self.negCounts[i], self.numNeg))
 			  self.stats['posStats'].append(generateDiscreteProbs(self.posCounts[i], self.numPos))
 			
-	  print(self.stats)	
+	  #print(self.stats)	
 			 
-			  
+  '''
+  Return a population of 20 random tuples
+  '''
+  def getTestingSamples(self, ss):
+  	 
+	  random.seed()
+	  tSet = set()
+	  x = 0
+	  #Get the 20 random indices
+	  while x < ss:
+		  r = random.randrange(0, self.total)
+		  if r not in tSet:
+			  tSet.add(r)
+			  x = x + 1
+	  #Get the 20 actual objects now
+	  tPop = []
+	  for x in tSet:
+		  tPop.append(self.data[x])
+ 
+	  return Population(tPop)
 
 
 '''

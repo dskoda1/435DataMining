@@ -12,11 +12,18 @@ import csv
 import sys
 import math
 import random
+import functools
 '''
 '''
 def checkArguments():
-	if(len(sys.argv) != 2):
-		print("Usage: \n\n\t python3 hw2.py <sample%>\n\n")
+
+	if(len(sys.argv) == 2):
+		return 1
+	elif(len(sys.argv) == 3):
+		return 2
+	else:
+		print("\n\n\t Usage: python3 hw2.py <sampleSize %>")
+		print("\t Optional: python3 hw2.py <sampleSize %> <number of tests to run>\n\n")
 		exit()
 
 '''
@@ -118,10 +125,68 @@ def filterOutTrainingSet(pop, tPop):
 	#return what is now the testing set	
 	return Population(testSet)
 
+'''
+Go through each of the items in the given population.
+For each tuples attribute, obtain the probability that
+it is positive or negative, and put them in seperate lists.
+upon completing the completion of these lists, multiply
+them together and pick the higher one, and use that to classify.
+Then compare these results with the actual labels.
+'''
+def attemptClassification(pop, stats, attrMap):
+
+	accuracy = []
+	#iterate through the populations adults
+	for i, x in enumerate(pop.data):
+		probMap = {'posProbs': [], 'negProbs': []}
+		#iterate through a specific adults attributes	
+		for j, y in enumerate(x.attr):
+			#for continuous variable, pass value to guass function
+			#along with the current mean and std dev for both
+			#pos/neg
+			if y['type'] == 'int':
+				posProb = guass(y['value'], stats['posStats'][j]['mean'], stats['posStats'][j]['dev'])
+				negProb = guass(y['value'], stats['negStats'][j]['mean'], stats['negStats'][j]['dev'])
+				probMap['posProbs'].append(posProb)
+				probMap['negProbs'].append(negProb)
+			#for discrete value, get the index value has in attribute map, 
+			#and use that to look up the probablity for that value inside stats
+			else:
+				idx = attrMap[j].index(y['value'])	
+				probMap['posProbs'].append(stats['posStats'][j][idx])
+				probMap['negProbs'].append(stats['negStats'][j][idx])
+		
+		#multiply each index of the separate lists together
+		posProb = functools.reduce(lambda x, y: x * y, probMap['posProbs'])
+		negProb = functools.reduce(lambda x, y: x * y, probMap['negProbs'])
+		#Now figure the larger one, and use that as classification label
+		label = 0
+		if posProb > negProb:
+			label = True
+		else:
+			label = False
+		#Check our label against actual label, store in accuracy list
+		accuracy.append(1) if label == x.label else accuracy.append(0) 
+	
+	return (functools.reduce(lambda x, y: x + y, accuracy)/20) * 100
+
+		#print("Positive is greater: ",posProb) if posProb > negProb else print("Negative is greater: ", negProb)
+
+
+
+'''
+Calculate a probability given value, mean, stddev
+'''
+def guass(val, mean, dev):
+	left = 1 / (dev * math.sqrt(2 * math.pi))
+	right = math.pow( ( (val - mean) / dev ), 2 ) * ( - 1 / 2 )
+	return left * ( math.pow( math.e , right)) 
 
 def main():
 	#Make sure program called correctly	
-	checkArguments()
+	runMode = checkArguments()
+	#run mode of 1 signifies just a single run, otherwise run
+	#sys.argv[2] times and get the average accuracy
 
 	#input the inital adults data file, clean data
 	population = readFile("adult.txt")
@@ -131,7 +196,13 @@ def main():
 	
 	#create training data set from the original,
 	#along with the percent requested from cmd line
-	trainingPop = createTrainingSet(population, sys.argv[1])
+	percent = sys.argv[1]
+	
+
+	trainingPop = createTrainingSet(population, percent)
+	
+	#Get the rest of the data as a testing data set
+	testingPop = filterOutTrainingSet(population, trainingPop)
 
 	#sum up/count occurences of values in the training set
 	trainingPop.countUpStats(attrMap)
@@ -140,14 +211,13 @@ def main():
 	#and averages/standard deviation for continuous values
 	trainingPop.performStatisticAnalysis(attrMap)
 
+	#Get 20 random tuples from the testing population
+	rPop = testingPop.getTestingSamples(20)
 
-
-
-	#Get the rest of the data as a testing data set
-	testingPop = filterOutTrainingSet(population, trainingPop)
-	
-	#
-
+	#Use the training population statsMap, and the random
+	#population from the testing set and classify them
+	accPercent = attemptClassification(rPop, trainingPop.stats, attrMap)
+	print(accPercent)
 
 main()
 
