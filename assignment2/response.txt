@@ -1,0 +1,26 @@
+Discuss the classification accuracies of the three different training sets.
+Training sets: 10%, 30%, 50% of total population
+Training runs: 500
+
+Size reports:
+	Training set size: 	 10 %
+	Average accuracy of: 	 82.69
+	Average time of run: 	 0.148235435962677
+	Number of runs: 	 500
+	Program mode: 		 Regular
+
+	Training set size: 	 30 %
+	Average accuracy of: 	 83.32
+	Average time of run: 	 0.32643302011489866
+	Number of runs: 	 500
+	Program mode: 		 Regular
+
+	Training set size: 	 50 %
+	Average accuracy of: 	 83.25
+	Average time of run: 	 0.5185891799926757
+	Number of runs: 	 500
+	Program mode: 		 Regular
+
+As you can see, all three different training sets produce very similar results. Over 500 runs the average for all 3 is ~83%, with 30% coming in first, 50% in second, and 10% in a close third. Based on the time taken for each run, the 10% is by far the most efficient.I would've expected the 50% training set to produce the best results, but I think having too many samples actually has a dilution effect, which is why the accuracy dropped slightly. It only dropped 0.08% though, which is very minimal and shows the increase in time from 30% to 50% is not worth it at all. It is clear that optimal accuracy can't be achieved with 10%, because there is a significant (not that significant!) increase of 0.63% when increasing the sample size to 30%, which I believe is optimal based on these results.
+
+
