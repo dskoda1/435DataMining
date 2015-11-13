@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """
 David Skoda
@@ -9,7 +9,7 @@ Environment: Python3, not compatible with Python2.7
 from Population import Population
 from Adult import Adult
 from Helper import *
-from func import *
+from Func import *
 import csv
 import sys
 import math
@@ -44,8 +44,18 @@ def readFile(fileName):
   #Create population object to return 
   return Population(data)
 
+def mainInput():
+  #input the inital adults data file, clean data
+  population = readFile("adult.txt")
+  
+  #get the backbone attribute map to be used later
+  attrMap = population.createAttrMap()
 
+  return {'pop': population, 'map': attrMap}
+  
 def mainRoutine(population, attrMap, percent):
+
+
   #Create the training population
   trainingPop = population.createTrainingSet( percent)
     
@@ -70,51 +80,41 @@ def mainRoutine(population, attrMap, percent):
 
 def main():
   #Make sure program called correctly 
-  runMode = checkArguments()
-  #run mode of 1 signifies just a single run, otherwise run
-  #sys.argv[2] times and get the average accuracy
-
-  #input the inital adults data file, clean data
-  population = readFile("adult.txt")
+  args = checkArguments()
   
-  #get the backbone attribute map to be used later
-  attrMap = population.createAttrMap()
-  
-  #create training data set from the original,
-  #along with the percent requested from cmd line
-  percent = sys.argv[1]
-
   #Init variables for bookkeeping 
   runs, x = 0, 0
   results = []
   gen = percentGen()
-  #Check whether to loop many times or not
-  if runMode == 1: 
-    runs = 1 
-  else: 
-    runs = int(sys.argv[2])
-    if runs < 10:
-      #Less than 10 runs in multirun is not allowed
-      print("Minimum amount of runs is 10.")
-      runs = 10
+  t0, t1 = 0, 0
   #Begin timing sequence
-  t0 = time.time()
-  #Begin loop
-  while x < runs: 
-    #Call the main, non functional routine
-    results.append(mainRoutine(population, attrMap, percent))
-    x = x + 1
-    if x % (runs / 10) ==0:
-      print( next(gen) , "%") 
-  #End timing sequence
-  t1 = time.time()
-
+  if args['mode'] == 'Regular':
+    data = mainInput()
+    print("Progress:")
+    t0 = time.time()
+    #Begin loop
+    while x < args['runs']:
+      results.append(mainRoutine(data['pop'], data['map'], args['percent']))
+      x = x + 1
+      if x % (args['runs'] / 10) == 0:
+        print( next(gen) , "%") 
+    #End timing sequence
+    t1 = time.time()
+  else:
+    x = "Functional stuff here"
+    print("Functional currently under construction.")
+    exit()
   #print out results
   print("\n\n")
-  print("\tAverage accuracy of: ", functools.reduce(lambda x, y: x + y, results) / runs)
-  print("\tAverage time of run: ", (t1 - t0) / runs)
-  print("\tNumber of runs: ", runs)
+  print("\tTraining set size: \t", args['percent'], "%")
+  print("\tAverage accuracy of: \t", functools.reduce(lambda x, y: x + y, results) / args['runs'])
+  print("\tAverage time of run: \t", (t1 - t0) / args['runs'])
+  print("\tNumber of runs: \t", args['runs'])
+  print("\tProgram mode: \t\t", args['mode'])
   print("\n\n")
+
+  #funcRoutine(population, attrMap, percent)
+
 
 main()
 

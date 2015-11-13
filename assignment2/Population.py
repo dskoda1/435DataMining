@@ -4,6 +4,8 @@ import math
 import random
 from Helper import *
 import functools
+
+
 '''
 Population is the object used to store all of the 
 data. It also tracks how many pos/negative vals there
@@ -21,15 +23,10 @@ class Population(object):
     
   
   def setPosNeg(self):
-    for x in self.data:
-      if x.label:
-        self.pos.append(x)
-        self.numPos = self.numPos + 1
-      else:
-        self.neg.append(x)
-        self.numNeg = self.numNeg + 1
-
-
+    self.pos = list(filter(isPos, self.data))
+    self.neg = list(filter(isNeg, self.data))
+    self.numPos = len(self.pos)
+    self.numNeg = len(self.neg)
   '''
   create the attribute map dynamically from the entire
   population. this is meant to be called on the entire 
@@ -278,6 +275,10 @@ class Population(object):
     return (functools.reduce(lambda x, y: x + y, accuracy)/20) * 100
 
 
+def isPos(x):
+  return (True if x.label else False)
+def isNeg(x):
+  return (False if x.label else True)
 
 
 
