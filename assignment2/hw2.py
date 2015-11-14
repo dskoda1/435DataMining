@@ -101,8 +101,8 @@ def main():
     #End timing sequence
     t1 = time.time()
   else:
-    x = "Functional stuff here"
     print("Functional currently under construction.")
+    funcRoutine()
     exit()
   #print out results
   print("\n\n")

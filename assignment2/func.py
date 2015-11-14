@@ -3,23 +3,30 @@ import copy
 import random
 import sys
 import time
+import csv
 '''
 Secondary methods to do bayesian classification
 primarily following functional programming paradigms
 Input: Data set as a Population
        Attribute map for the layout of each Adult
        Percent wanted for the training set
+1. Read the file into an array, cleaning tuples
+that have ? as an attr value
 
-1. Create the training set
+2. Create the empty attr map that has a list
+of all possible values for discrete attributes
+at that index
 
-2. Get the 20 test samples out of
+3. Create the training set using stratified sampling
+
+4. Get the 20 test samples out of
   remaining population
 
-3. Get the stats for each attribute pos/neg
+5. Get the stats for each attribute pos/neg
   Discrete: Count up the occurences
   Continuous: Get the sum, mean, & stdDev
 
-4. Calculate the probabilities
+6. Calculate the probabilities
   Discrete: Divide # of occurences by size
   Continuous: 
 
@@ -27,19 +34,73 @@ Input: Data set as a Population
 
 '''
 
-def funcRoutine(pop, attrMap, percent):
+def funcRoutine(): 
+  
+  data = readFile()
+
+  attrMap = createAttrMap(pop)
+
+
+
   #get the positive and negative training sets
   #along with the 20 testing samples
-  tSet = createTrainTestSet(pop, percent)
+  #tSet = createTrainTestSet(pop, percent)
  
   #Do some data manipulation on the tSet
   #to organize it into a list of lists, with 
   #each primary list being an attribute
-  matrix = manipDataSet(tSet) 
+  #matrix = manipDataSet(tSet) 
 
   
 
+def createAttrMap(pop):
+  
+  
+  for x in pop:
+    for y in x:
+      
+      if isinstance(y, int):
+        break
+      else
 
+def readFile():
+  f = open('adult.txt', 'rU')
+  data = []
+  #initialize the array with a single tuple from 
+  #the file
+  try:
+    reader = csv.reader(f)
+    for row in reader:
+      for x in row:
+        data.append([])
+      break
+  finally:
+    f.close
+  f = open('adult.txt', 'rU')
+
+  valid = True
+  try:
+    reader = csv.reader(f)
+    for row in reader:
+      temp = []
+      valid = True
+      for x in row:
+        #get rid of row if attr has ?
+        if x == '?':
+          valid = False
+          break
+        try:
+          a = int(x)
+          temp.append(a)
+        except ValueError:
+          temp.append(x)
+      if valid:
+        for i, y in enumerate(temp):
+          data[i].append(y)
+  finally:
+    f.close()
+
+  return data
 
 def manipDataSet(tSet):
   #create the skeleton
