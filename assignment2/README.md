@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/travis-ci/travis-web.svg?branch=web-on-v3)](https://travis-ci.org/travis-ci/travis-web)
-
 ##Command line usage:
 
 For standard usage:
