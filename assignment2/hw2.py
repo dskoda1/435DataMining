@@ -102,7 +102,7 @@ def main():
     t1 = time.time()
   else:
     print("Functional currently under construction.")
-    funcRoutine()
+    funcRoutine(args['percent'])
     exit()
   #print out results
   print("\n\n")

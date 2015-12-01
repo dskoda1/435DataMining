@@ -4,6 +4,7 @@ import random
 import sys
 import time
 import csv
+import functools
 '''
 Secondary methods to do bayesian classification
 primarily following functional programming paradigms
@@ -34,34 +35,66 @@ at that index
 
 '''
 
-def funcRoutine(): 
+def funcRoutine(percent): 
   
   data = readFile()
+  attrMap = createAttrMap(data)
+  tSet = createTTset(data, percent)
 
-  attrMap = createAttrMap(pop)
 
+def createTTset(pop, percent):
+  SS = len(pop[0]) / (100/int(percent))
+  pos = list(filter(isPos, pop[len(pop) - 1]))
+  print(pos)
+  
 
+def isPos(val):
+  if '>' in val:
+    return True
+  else:
+    return False
 
-  #get the positive and negative training sets
-  #along with the 20 testing samples
-  #tSet = createTrainTestSet(pop, percent)
- 
-  #Do some data manipulation on the tSet
-  #to organize it into a list of lists, with 
-  #each primary list being an attribute
-  #matrix = manipDataSet(tSet) 
+def createTrainTestSet(pop, percent):
+  SS = len(pop.data) / (100/int(percent))
+  posRatio = len(pop.pos) / pop.total
+  negRatio = len(pop.neg) / pop.total
+  posSS = int(SS * posRatio)
+  negSS = int(SS * negRatio)
+  random.seed()
+  #Get the random values of objects to be plucked out
+  pos = set(random.sample(pop.pos, posSS))
+  neg = set(random.sample(pop.neg, negSS))
 
+  #get 20 values from the rest of the list
+  rem = set(pop.data) - (pos | neg)
+  test = set(random.sample(rem, 20))
+  return {'pos': pos, 'neg': neg, 'test': test}
   
 
 def createAttrMap(pop):
   
-  
-  for x in pop:
+  attrMap = []
+  #Go through just the first object available  
+  for i, x in enumerate(pop):
     for y in x:
-      
+      #push a 0, and break to next
       if isinstance(y, int):
+        attrMap.append(0)
         break
-      else
+      else:
+        attrMap.append([])
+        break
+
+  for i, x in enumerate(attrMap):
+    if isinstance(x, int):
+      continue
+    else:
+      distinct = set(pop[i])
+      attrMap[i] = copy.deepcopy(list(distinct))
+
+  return attrMap
+
+
 
 def readFile():
   f = open('adult.txt', 'rU')
@@ -86,7 +119,7 @@ def readFile():
       valid = True
       for x in row:
         #get rid of row if attr has ?
-        if x == '?':
+        if '?' in x:
           valid = False
           break
         try:
@@ -101,6 +134,14 @@ def readFile():
     f.close()
 
   return data
+  #get the positive and negative training sets
+  #along with the 20 testing samples
+  #tSet = createTrainTestSet(pop, percent)
+ 
+  #Do some data manipulation on the tSet
+  #to organize it into a list of lists, with 
+  #each primary list being an attribute
+  #matrix = manipDataSet(tSet) 
 
 def manipDataSet(tSet):
   #create the skeleton
@@ -118,21 +159,6 @@ def manipDataSet(tSet):
 
 
 
-def createTrainTestSet(pop, percent):
-  SS = len(pop.data) / (100/int(percent))
-  posRatio = len(pop.pos) / pop.total
-  negRatio = len(pop.neg) / pop.total
-  posSS = int(SS * posRatio)
-  negSS = int(SS * negRatio)
-  random.seed()
-  #Get the random values of objects to be plucked out
-  pos = set(random.sample(pop.pos, posSS))
-  neg = set(random.sample(pop.neg, negSS))
-
-  #get 20 values from the rest of the list
-  rem = set(pop.data) - (pos | neg)
-  test = set(random.sample(rem, 20))
-  return {'pos': pos, 'neg': neg, 'test': test}
 
 
 '''
