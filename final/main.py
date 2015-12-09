@@ -18,14 +18,14 @@ if __name__ == '__main__':
   data = readFile('data.txt')
   args = getUserInput() 
   
-  #Run the kmeans 
+  #Run the kmeans function a bunch of times, save results
   classes = [0] * 6
-
   for x in range(args['runs']):
     clusteredVecs = kMeans(data, args['k'], 50)
     for point in clusteredVecs:
       classes[point['cluster']] = classes[point['cluster']] + 1  
   
+  #average and print out results
   for i, x in enumerate(classes):
     classes[i] = x / args['runs']
     print(classes[i])  
