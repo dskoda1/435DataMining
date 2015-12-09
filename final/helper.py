@@ -14,8 +14,8 @@ def kMeans(data, k, runs):
   centroids = random.sample(data, k)
   
   #Assign each vector to an initial cluster, save as array of dict like
-  #{'vec': [x1, x2, x3..], 'cluster': kx}
-  mappedVecs = [assignToCluster(vec, centroids) for vec in data]
+  #{'vec': [x1, x2, x3..], 'cluster': kx, 'class': ky}
+  mappedVecs = [assignToCluster(vec, centroids, i) for i, vec in enumerate(data)]
 
   #reassign each vector the specified amount of times, 
   #recomputing the average of each cluster every run
@@ -28,10 +28,10 @@ def kMeans(data, k, runs):
 
 #Assign each vector to a cluster, return 
 #in the form of a dictionary
-def assignToCluster(vec, centroids):
+def assignToCluster(vec, centroids, i):
   minK = numpy.argmin([distance.euclidean(vec, centroid) for centroid in centroids])
-  return {'cluster': minK, 'vec': vec}
-
+  return {'cluster': minK, 'vec': vec, 'class': (i // 100)}
+  
 #filter function to return vecs from a cluster
 def isInCluster(vec, cluster):
   return (True if cluster == vec['cluster'] else False)

@@ -19,16 +19,18 @@ if __name__ == '__main__':
   args = getUserInput() 
   
   #Run the kmeans function a bunch of times, save results
-  classes = [0] * 6
+  acc = 0
   for x in range(args['runs']):
     clusteredVecs = kMeans(data, args['k'], 50)
-    for point in clusteredVecs:
-      classes[point['cluster']] = classes[point['cluster']] + 1  
+    acc = acc + (len([vec for vec in clusteredVecs if vec['class'] == vec['cluster']]) / len(clusteredVecs))
+  print(str(acc / args['runs']))
+  #  for point in clusteredVecs:
+  #    classes[point['cluster']] = classes[point['cluster']] + 1  
   
   #average and print out results
-  for i, x in enumerate(classes):
-    classes[i] = x / args['runs']
-    print(classes[i])  
+  #for i, x in enumerate(classes):
+  #  classes[i] = x / args['runs']
+  #  print(classes[i])  
   
     
     
