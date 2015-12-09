@@ -14,28 +14,24 @@ import random
 
 if __name__ == '__main__':
 
-  #define some variables
-  fileName = 'data.txt'  
-  data = readFile(fileName)
+  #Get data from file, and cmd line args
+  data = readFile('data.txt')
   args = getUserInput() 
   
-  
-  #select k random data points
-  random.seed()
-  centroids = random.sample(data, args['k'])
-  
-  #map the vectors to their initial clusters
-  mappedVecs = [assignToCluster(vec, centroids) for vec in data]
-
-  for x in range(0, args['runs']):
-    clusterMeans = [getAverageOfCluster(mappedVecs, i) for i in range(0, args['k'])]
-    mappedVecs = [reassignToCluster(vec, clusterMeans) for vec in mappedVecs]  
-    
+  #Run the kmeans 
   classes = [0] * 6
-  for point in mappedVecs:
-    classes[point['cluster']] = classes[point['cluster']] + 1  
+
+  for x in range(args['runs']):
+    clusteredVecs = kMeans(data, args['k'], 50)
+    for point in clusteredVecs:
+      classes[point['cluster']] = classes[point['cluster']] + 1  
   
-  for x in range(301, 400):
-    print(mappedVecs[x]['cluster'])
+  for i, x in enumerate(classes):
+    classes[i] = x / args['runs']
+    print(classes[i])  
+  
+    
+    
+  
 
 

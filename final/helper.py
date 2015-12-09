@@ -2,23 +2,26 @@
 import sys
 import csv
 import functools
+import random
 from scipy.spatial import distance
 import numpy
 
 
 
+def kMeans(data, k, runs):
+  #select k random data points
+  random.seed()
+  centroids = random.sample(data, k)
+  mappedVecs = [assignToCluster(vec, centroids) for vec in data]
 
-  
-def getUserInput():
-  #Get the user input 'k' value
-  k = int(sys.argv[1])
-  
-  runs = int(sys.argv[2])
-  return {'k': k, 'runs': runs}
+  for x in range(runs):
+    clusterMeans = [getAverageOfCluster(mappedVecs, i) for i in range(0, k)]
+    mappedVecs = [reassignToCluster(vec, clusterMeans) for vec in mappedVecs]  
+    
+  return mappedVecs
 
 def assignToCluster(vec, centroids):
   minK = numpy.argmin([distance.euclidean(vec, centroid) for centroid in centroids])
-  #return the vector wrapped up
   return {'cluster': minK, 'vec': vec}
   
 def isInCluster(vec, cluster):
@@ -33,8 +36,10 @@ def reassignToCluster(vec, clusterMeans):
   vec['cluster'] = numpy.argmin([distance.euclidean(vec['vec'], clusterMean) for clusterMean in clusterMeans])
   return vec
 
+
+
 '''
-File input helper functions
+File input and cmd line arg helper functions
 '''
 def readFile(fileName):
   #Split lines from file
@@ -56,3 +61,8 @@ def convertListToFloats(row):
   
 def convertStringToFloat(string):
   return float(string)
+  
+def getUserInput():
+  k = int(sys.argv[1])
+  runs = int(sys.argv[2])
+  return {'k': k, 'runs': runs}
