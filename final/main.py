@@ -12,24 +12,30 @@ from helper import *
 from scipy.spatial import distance
 import random
 
-#Main function
 if __name__ == '__main__':
 
   #define some variables
   fileName = 'data.txt'  
   data = readFile(fileName)
+  args = getUserInput() 
   
-  #Get the user input 'k' value
-  k = int(sys.argv[1])
   
   #select k random data points
   random.seed()
-  centroids = random.sample(data, k)
-  for x in centroids:
-      print(x)
+  centroids = random.sample(data, args['k'])
   
+  #map the vectors to their initial clusters
+  mappedVecs = [assignToCluster(vec, centroids) for vec in data]
+
+  for x in range(0, args['runs']):
+    clusterMeans = [getAverageOfCluster(mappedVecs, i) for i in range(0, args['k'])]
+    mappedVecs = [reassignToCluster(vec, clusterMeans) for vec in mappedVecs]  
+    
+  classes = [0] * 6
+  for point in mappedVecs:
+    classes[point['cluster']] = classes[point['cluster']] + 1  
   
-  
-  
-  # print(distance.euclidean(data[1], data[4]))
+  for x in range(301, 400):
+    print(mappedVecs[x]['cluster'])
+
 
