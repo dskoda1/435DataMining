@@ -6,6 +6,11 @@ import random
 import copy
 from scipy.spatial import distance
 import numpy
+import math as m
+
+'''
+Kmeans and helper functions below
+'''
 
 def kMeans(data, k):
   #select k random data points
@@ -22,6 +27,7 @@ def kMeans(data, k):
       break;
     
   return mappedVecs
+  
 
 def assignToCluster(vec, centroids, i):
   minK = numpy.argmin([distance.euclidean(vec, centroid) for centroid in centroids])
@@ -42,7 +48,56 @@ def reassignToCluster(vec, clusterMeans):
     vec['change'] = True
   vec['cluster'] = clus
   return vec
-def add(x, y): return (x + y)  
+def add(x, y): return (x + y) 
+
+'''
+DCT and helper functions below
+'''
+def transform(data, k):
+  uVec = copy.deepcopy(dct(data))
+  c = findCutOffIndex(uVec)
+  return ([copy.deepcopy(x[:c + k]) for x in data])
+
+def dct(data):
+  res = []
+  for vec in data:
+    dctV = []
+    
+    for i, x in enumerate(vec):
+      total, a = 0, 0
+      length = len(vec)
+      
+      total = vec[i] * m.cos(( ((2 * i) + 1) * i * m.pi) / (2 * length))
+      for j in range(length):
+        val = vec[j] * m.cos(( ((2 * j) + 1) * i * m.pi) / (2 * length))
+        total += val
+      if i == 0:
+        a = m.sqrt(1/length)
+      else:
+        a = m.sqrt(2/length)
+      dctV.append((a * total))
+    res.append(copy.deepcopy(dctV))
+  
+  return res
+  
+def findCutOffIndex(uVecs):
+  res = []
+  for vec in uVecs:
+    cutOff = max(vec) / 20
+    c = 0
+    for i, x in enumerate(vec):
+      if abs(x) < cutOff:
+        c = i
+        break
+    res.append(c)
+  return max(res)
+    
+  
+'''
+Accuracy calculations
+'''
+
+
 
 def getAccuracy(counter):
   maxApp = 0
@@ -102,6 +157,23 @@ def convertStringToFloat(string):
   return float(string)
   
 def getUserInput():
-  #k = int(sys.argv[1])
-  runs = int(sys.argv[1])
-  return {'runs': runs}
+  if len(sys.argv) < 2 or sys.argv[1] == 'usage':
+    print('\n\n\t\033[1mUsage:\033[0m python3 main.py <number of runs to average together> <k value for DCT(optional)>')
+    print('\n\tThe \033[1moptional\033[0m k value specified could be:')
+    print('\t0: This tells the program to simply select the largest C value from all data points, after performing DCT.')
+    print('\tn <- [1..59]: This will add n to the largest C value from DCT, allowing for trial and error testing.\n\n')
+    exit()
+  ret = {'runs': 1, 'k': -1}
+  if len(sys.argv) > 2:
+    ret['k'] = int(sys.argv[2])
+    if ret['k'] > 59:
+      print('K value of', ret['k'], 'is invalid, not performing DCT.')
+      ret['k'] = -1
+  if len(sys.argv) > 1:
+    ret['runs'] = int(sys.argv[1])
+  return ret
+  
+# def percentGen():
+#   y = list(range(1, 11))
+#   for x in y:
+#     yield x * 10
