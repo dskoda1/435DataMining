@@ -16,14 +16,16 @@ import time
 
 if __name__ == '__main__':
   print('')
-# number 
+  
   #Get data from file, and cmd line args
   data = readFile('data.txt')
   args = getUserInput() 
-  t0, t1 = 0, 0
-  #Bundle the following off to a DCTransform function helper
+  
+  #Begin main program execution
+  t0, t1, acc = 0, 0, 0
   if args['k'] > -1:
-    print('\n\tStarting DCT')
+    #Execute DCT on file data
+    print('\n\t\033[1m--------Starting DCT--------\033[0m')
     print('\tK value provided:', args['k'])
     t0 = time.time()
     data = copy.deepcopy(transform(data, args['k']))
@@ -32,20 +34,18 @@ if __name__ == '__main__':
     print('\n\tC value selected by DCT:',  (len(data[0]) - args['k']))
     
   print('\tNumber of attributes per data point:', len(data[0]))
-  ###
-  #Run the kmeans function a bunch of times, save results
-  acc = 0
-  print('\n\tStarting K Means')
-  # gen = percentGen()
+  print('\n\t\033[1m--------Starting K Means--------\033[0m')
+  #Begin execution of K Means algorithm 
   t0 = time.time()
   for x in range(args['runs']):
-    sys.stdout.write('\r\tRun %d' % (x+1))
     clusteredVecs = copy.deepcopy(kMeans(data, 6))
     acc = acc + getAccuracy(getOccurences(clusteredVecs))
+    sys.stdout.write('\r\tRun %d' %(x+1))
   t1 = time.time()
+  
+  #Print out results  
   print('\n\t\tCompleted in:', t1-t0, 'seconds')
-      
   print('\n\tRuns: ' + str(args['runs']))
-  print('\tAccuracy: ' + str(acc/args['runs']))
+  print('\tAccuracy: ' + str(acc/args['runs']) + '%')
   print('')
 
