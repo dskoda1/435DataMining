@@ -46,6 +46,6 @@ if __name__ == '__main__':
   #Print out results  
   print('\n\t\tCompleted in:', t1-t0, 'seconds')
   print('\n\tRuns: ' + str(args['runs']))
-  print('\tAccuracy: ' + str(acc/args['runs']) + '%')
+  print('\t\033[1mAccuracy: ' + str(acc/args['runs']) + '%\033[0m')
   print('')
 
