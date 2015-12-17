@@ -45,3 +45,7 @@ error-and-trial test. For a reduced dimensionality value h (h<60), apply your K-
 the whole dataset (of the 600 data points) in the h dimensional space, and document the 
 accuracy for such a reduced dimensionality value h. What is the minimum such h value 
 that the accuracy can still be maintained at least 90%?
+
+#####Github URL:
+
+https://github.com/dskoda1/Data-Mining/tree/master/final
